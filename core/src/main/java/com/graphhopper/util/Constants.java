@@ -68,6 +68,7 @@ public class Constants {
 
     public static final int VERSION_NODE = 9;
     public static final int VERSION_EDGE = 21;
+    public static final int VERSION_EDGE_ATTRIBUTES = 1;
     // this should be increased whenever the format of the serialized EncodingManager is changed
     public static final int VERSION_EM = 1;
     public static final int VERSION_SHORTCUT = 9;
