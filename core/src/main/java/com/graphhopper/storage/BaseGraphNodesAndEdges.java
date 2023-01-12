@@ -48,10 +48,14 @@ class BaseGraphNodesAndEdges {
 
     // edges
     private final DataAccess edges;
-    private final int E_NODEA, E_NODEB, E_LINKA, E_LINKB, E_FLAGS, E_DIST, E_GEO, E_KV;
-    private final int intsForFlags;
+    private final int E_NODEA, E_NODEB, E_LINKA, E_LINKB;
     private int edgeEntryBytes;
     private int edgeCount;
+
+    private final DataAccess edgeAttributes;
+    private final int E_FLAGS, E_DIST, E_GEO, E_KV;
+    private final int intsForFlags;
+    private int edgeAttributeBytes;
 
     private final boolean withTurnCosts;
     private final boolean withElevation;
@@ -65,6 +69,7 @@ class BaseGraphNodesAndEdges {
     public BaseGraphNodesAndEdges(Directory dir, int intsForFlags, boolean withElevation, boolean withTurnCosts, int segmentSize) {
         nodes = dir.create("nodes", dir.getDefaultType("nodes", true), segmentSize);
         edges = dir.create("edges", dir.getDefaultType("edges", true), segmentSize);
+        edgeAttributes = dir.create("edge_attributes", dir.getDefaultType("edge_attributes", true), segmentSize);
         this.intsForFlags = intsForFlags;
         this.withTurnCosts = withTurnCosts;
         this.withElevation = withElevation;
@@ -78,25 +83,29 @@ class BaseGraphNodesAndEdges {
         N_TC = N_ELE + (withTurnCosts ? 4 : 0);
         nodeEntryBytes = N_TC + 4;
 
-        // memory layout for edges
+        // memory layout for topological edge data
         E_NODEA = 0;
         E_NODEB = 4;
         E_LINKA = 8;
         E_LINKB = 12;
-        E_FLAGS = 16;
+        edgeEntryBytes = E_LINKB + 4;
+
+        // memory layout for edge attributes
+        E_FLAGS = 0;
         E_DIST = E_FLAGS + intsForFlags * 4;
         E_GEO = E_DIST + 4;
         E_KV = E_GEO + 4;
-        edgeEntryBytes = E_KV + 4;
+        edgeAttributeBytes = E_KV + 4;
     }
 
     public void create(long initSize) {
         nodes.create(initSize);
         edges.create(initSize);
+        edgeAttributes.create(initSize);
     }
 
     public boolean loadExisting() {
-        if (!nodes.loadExisting() || !edges.loadExisting())
+        if (!nodes.loadExisting() || !edges.loadExisting() || !edgeAttributes.loadExisting())
             return false;
 
         // now load some properties from stored data
@@ -123,6 +132,10 @@ class BaseGraphNodesAndEdges {
         GHUtility.checkDAVersion("edges", Constants.VERSION_EDGE, edgesVersion);
         edgeEntryBytes = edges.getHeader(1 * 4);
         edgeCount = edges.getHeader(2 * 4);
+
+        final int edgeAttributesVersion = edgeAttributes.getHeader(0 * 4);
+        GHUtility.checkDAVersion("edge_attributes", Constants.VERSION_EDGE_ATTRIBUTES, edgeAttributesVersion);
+        edgeAttributeBytes = edgeAttributes.getHeader(1 * 4);
         return true;
     }
 
@@ -145,13 +158,18 @@ class BaseGraphNodesAndEdges {
         edges.setHeader(1 * 4, edgeEntryBytes);
         edges.setHeader(2 * 4, edgeCount);
 
-        edges.flush();
+        edgeAttributes.setHeader(0 * 4, Constants.VERSION_EDGE_ATTRIBUTES);
+        edgeAttributes.setHeader(1 * 4, edgeAttributeBytes);
+
         nodes.flush();
+        edges.flush();
+        edgeAttributes.flush();
     }
 
     public void close() {
-        edges.close();
         nodes.close();
+        edges.close();
+        edgeAttributes.close();
     }
 
     public int getNodes() {
@@ -179,11 +197,11 @@ class BaseGraphNodesAndEdges {
     }
 
     public long getCapacity() {
-        return nodes.getCapacity() + edges.getCapacity();
+        return nodes.getCapacity() + edges.getCapacity() + edgeAttributes.getCapacity();
     }
 
     public boolean isClosed() {
-        assert nodes.isClosed() == edges.isClosed();
+        assert nodes.isClosed() == edges.isClosed() && nodes.isClosed() == edgeAttributes.isClosed();
         return nodes.isClosed();
     }
 
@@ -195,6 +213,7 @@ class BaseGraphNodesAndEdges {
         final long edgePointer = (long) edgeCount * edgeEntryBytes;
         edgeCount++;
         edges.ensureCapacity((long) edgeCount * edgeEntryBytes);
+        edgeAttributes.ensureCapacity((long) edgeCount * edgeAttributeBytes);
 
         setNodeA(edgePointer, nodeA);
         setNodeB(edgePointer, nodeB);
@@ -240,24 +259,30 @@ class BaseGraphNodesAndEdges {
         return (long) edge * edgeEntryBytes;
     }
 
+    public long toEdgeAttributePointer(int edge) {
+        if (edge < 0 || edge >= edgeCount)
+            throw new IllegalArgumentException("edge: " + edge + " out of bounds [0," + edgeCount + "[");
+        return (long) edge * edgeAttributeBytes;
+    }
+
     public int getInt(long edgePointer, int index) {
-        return edges.getInt(edgePointer + E_FLAGS + index * 4L);
+        return edgeAttributes.getInt(edgePointer + E_FLAGS + index * 4L);
     }
 
     public void setInt(long edgePointer, int index, int value) {
-        edges.setInt(edgePointer + E_FLAGS + index * 4L, value);
+        edgeAttributes.setInt(edgePointer + E_FLAGS + index * 4L, value);
     }
 
-    public void readFlags(long edgePointer, IntsRef edgeFlags) {
+    public void readFlags(long edgeAttributePointer, IntsRef edgeFlags) {
         int size = edgeFlags.size();
         for (int i = 0; i < size; ++i)
-            edgeFlags.setInt(i, edges.getInt(edgePointer + E_FLAGS + i * 4));
+            edgeFlags.setInt(i, edgeAttributes.getInt(edgeAttributePointer + E_FLAGS + i * 4));
     }
 
-    public void writeFlags(long edgePointer, IntsRef edgeFlags) {
+    public void writeFlags(long edgeAttributePointer, IntsRef edgeFlags) {
         int size = edgeFlags.size();
         for (int i = 0; i < size; ++i)
-            edges.setInt(edgePointer + E_FLAGS + i * 4, edgeFlags.getInt(i));
+            edgeAttributes.setInt(edgeAttributePointer + E_FLAGS + i * 4L, edgeFlags.getInt(i));
     }
 
     public void setNodeA(long edgePointer, int nodeA) {
@@ -276,16 +301,16 @@ class BaseGraphNodesAndEdges {
         edges.setInt(edgePointer + E_LINKB, linkB);
     }
 
-    public void setDist(long edgePointer, double distance) {
-        edges.setInt(edgePointer + E_DIST, distToInt(distance));
+    public void setDist(long edgeAttributePointer, double distance) {
+        edgeAttributes.setInt(edgeAttributePointer + E_DIST, distToInt(distance));
     }
 
-    public void setGeoRef(long edgePointer, int geoRef) {
-        edges.setInt(edgePointer + E_GEO, geoRef);
+    public void setGeoRef(long edgeAttributePointer, int geoRef) {
+        edgeAttributes.setInt(edgeAttributePointer + E_GEO, geoRef);
     }
 
-    public void setKeyValuesRef(long edgePointer, int nameRef) {
-        edges.setInt(edgePointer + E_KV, nameRef);
+    public void setKeyValuesRef(long edgeAttributePointer, int nameRef) {
+        edgeAttributes.setInt(edgeAttributePointer + E_KV, nameRef);
     }
 
     public int getNodeA(long edgePointer) {
@@ -304,18 +329,18 @@ class BaseGraphNodesAndEdges {
         return edges.getInt(edgePointer + E_LINKB);
     }
 
-    public double getDist(long pointer) {
-        int val = edges.getInt(pointer + E_DIST);
+    public double getDist(long edgeAttributePointer) {
+        int val = edgeAttributes.getInt(edgeAttributePointer + E_DIST);
         // do never return infinity even if INT MAX, see #435
         return val / INT_DIST_FACTOR;
     }
 
-    public int getGeoRef(long edgePointer) {
-        return edges.getInt(edgePointer + E_GEO);
+    public int getGeoRef(long edgeAttributePointer) {
+        return edgeAttributes.getInt(edgeAttributePointer + E_GEO);
     }
 
-    public int getKeyValuesRef(long edgePointer) {
-        return edges.getInt(edgePointer + E_KV);
+    public int getKeyValuesRef(long edgeAttributePointer) {
+        return edgeAttributes.getInt(edgeAttributePointer + E_KV);
     }
 
     public void setEdgeRef(long nodePointer, int edgeRef) {
@@ -384,14 +409,15 @@ class BaseGraphNodesAndEdges {
         IntsRef intsRef = new IntsRefImpl(intsForFlags);
         for (int i = 0; i < Math.min(edgeCount, printMax); ++i) {
             long edgePointer = toEdgePointer(i);
-            readFlags(edgePointer, intsRef);
+            long edgeAttributePointer = toEdgeAttributePointer(i);
+            readFlags(edgeAttributePointer, intsRef);
             System.out.format(Locale.ROOT, formatEdges, i,
                     getNodeA(edgePointer),
                     getNodeB(edgePointer),
                     getLinkA(edgePointer),
                     getLinkB(edgePointer),
                     intsRef,
-                    getDist(edgePointer));
+                    getDist(edgeAttributePointer));
         }
         if (edgeCount > printMax) {
             System.out.printf(Locale.ROOT, " ... %d more edges", edgeCount - printMax);
@@ -411,6 +437,7 @@ class BaseGraphNodesAndEdges {
 
     public String toDetailsString() {
         return "edges: " + nf(edgeCount) + "(" + edges.getCapacity() / Helper.MB + "MB), "
+                + "edge-attributes: " + nf(edgeCount) + "(" + edgeAttributes.getCapacity() / Helper.MB + "MB), "
                 + "nodes: " + nf(nodeCount) + "(" + nodes.getCapacity() / Helper.MB + "MB), "
                 + "bounds: " + bounds;
     }
