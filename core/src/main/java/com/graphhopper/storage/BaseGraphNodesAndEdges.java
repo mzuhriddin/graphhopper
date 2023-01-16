@@ -241,11 +241,11 @@ class BaseGraphNodesAndEdges {
     }
 
     public int getInt(long edgePointer, int index) {
-        return edges.getInt(edgePointer + E_FLAGS + index * 4);
+        return edges.getInt(edgePointer + E_FLAGS + index * 4L);
     }
 
     public void setInt(long edgePointer, int index, int value) {
-        edges.setInt(edgePointer + E_FLAGS + index * 4, value);
+        edges.setInt(edgePointer + E_FLAGS + index * 4L, value);
     }
 
     public void readFlags(long edgePointer, IntsRef edgeFlags) {
