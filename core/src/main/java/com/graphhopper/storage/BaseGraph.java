@@ -579,6 +579,7 @@ public class BaseGraph implements Graph, Closeable {
 
         void goToNext() {
             edgePointer = store.toEdgePointer(nextEdgeId);
+            ((TransparentIntsRef) intsRef).edgePointer = edgePointer;
             edgeId = nextEdgeId;
             int nodeA = store.getNodeA(edgePointer);
             boolean baseNodeIsNodeA = baseNode == nodeA;
@@ -618,6 +619,7 @@ public class BaseGraph implements Graph, Closeable {
             if (edgeId >= store.getEdges())
                 return false;
             edgePointer = store.toEdgePointer(edgeId);
+            ((TransparentIntsRef) intsRef).edgePointer = edgePointer;
             baseNode = store.getNodeA(edgePointer);
             adjNode = store.getNodeB(edgePointer);
             reverse = false;
@@ -632,6 +634,7 @@ public class BaseGraph implements Graph, Closeable {
             AllEdgeIterator iter = new AllEdgeIterator(baseGraph);
             iter.edgeId = edgeId;
             iter.edgePointer = edgePointer;
+            intsRef = getFlags();
             if (reverseArg) {
                 iter.reverse = !this.reverse;
                 iter.baseNode = adjNode;
@@ -654,10 +657,12 @@ public class BaseGraph implements Graph, Closeable {
         // we need reverse if detach is called
         boolean reverse = false;
         int edgeId = -1;
+        IntsRef intsRef;
 
         public EdgeIteratorStateImpl(BaseGraph baseGraph) {
             this.baseGraph = baseGraph;
             store = baseGraph.store;
+            intsRef = new TransparentIntsRef(store);
         }
 
         /**
@@ -670,6 +675,7 @@ public class BaseGraph implements Graph, Closeable {
             edgePointer = store.toEdgePointer(edgeId);
             baseNode = store.getNodeA(edgePointer);
             adjNode = store.getNodeB(edgePointer);
+            ((TransparentIntsRef) intsRef).edgePointer = edgePointer;
 
             if (expectedAdjNode == adjNode || expectedAdjNode == Integer.MIN_VALUE) {
                 reverse = false;
@@ -694,6 +700,7 @@ public class BaseGraph implements Graph, Closeable {
             edgePointer = store.toEdgePointer(edgeId);
             baseNode = store.getNodeA(edgePointer);
             adjNode = store.getNodeB(edgePointer);
+            ((TransparentIntsRef) intsRef).edgePointer = edgePointer;
 
             if (edgeKey % 2 == 0 || baseNode == adjNode) {
                 reverse = false;
@@ -734,27 +741,38 @@ public class BaseGraph implements Graph, Closeable {
         }
 
         private IntsRef getIntsRef(long edgePointer) {
-            return new IntsRef() {
-                @Override
-                public int getInt(int index) {
-                    return store.getInt(edgePointer, index);
-                }
+            if (intsRef instanceof TransparentIntsRef)
+                ((TransparentIntsRef) intsRef).edgePointer = edgePointer;
+            return intsRef;
+        }
 
-                @Override
-                public void setInt(int index, int value) {
-                    store.setInt(edgePointer, index, value);
-                }
+        public static class TransparentIntsRef implements IntsRef {
+            long edgePointer = -1;
+            BaseGraphNodesAndEdges store;
 
-                @Override
-                public boolean isEmpty() {
-                    throw new IllegalStateException();
-                }
+            public TransparentIntsRef(BaseGraphNodesAndEdges store) {
+                this.store = store;
+            }
 
-                @Override
-                public int size() {
-                    throw new IllegalStateException();
-                }
-            };
+            @Override
+            public int getInt(int index) {
+                return store.getInt(edgePointer, index);
+            }
+
+            @Override
+            public void setInt(int index, int value) {
+                store.setInt(edgePointer, index, value);
+            }
+
+            @Override
+            public boolean isEmpty() {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public int size() {
+                throw new IllegalStateException();
+            }
         }
 
         @Override
