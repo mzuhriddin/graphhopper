@@ -150,14 +150,6 @@ public abstract class BitUtil {
 
     public abstract byte[] fromBitString(String str);
 
-    public final String toBitString(IntsRef intsRef) {
-        StringBuilder str = new StringBuilder();
-        for (int ints : intsRef.ints) {
-            str.append(toBitString(ints, 32));
-        }
-        return str.toString();
-    }
-
     /**
      * Similar to Long.toBinaryString
      */

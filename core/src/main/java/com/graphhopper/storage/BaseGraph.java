@@ -728,7 +728,7 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public IntsRef getFlags() {
-            IntsRef edgeFlags = new IntsRef(store.getIntsForFlags());
+            IntsRef edgeFlags = new IntsRefImpl(store.getIntsForFlags());
             store.readFlags(edgePointer, edgeFlags);
             return edgeFlags;
         }

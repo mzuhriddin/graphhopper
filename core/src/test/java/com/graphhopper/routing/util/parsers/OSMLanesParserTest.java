@@ -23,6 +23,7 @@ import com.graphhopper.routing.ev.EncodedValue;
 import com.graphhopper.routing.ev.IntEncodedValue;
 import com.graphhopper.routing.ev.Lanes;
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.IntsRefImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,13 +37,13 @@ class OSMLanesParserTest {
     void setup() {
         lanesEnc.init(new EncodedValue.InitializerConfig());
         parser = new OSMLanesParser(lanesEnc);
-        relFlags = new IntsRef(2);
+        relFlags = new IntsRefImpl(2);
     }
 
     @Test
     void basic() {
         ReaderWay readerWay = new ReaderWay(1);
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         readerWay.setTag("lanes", "4");
         parser.handleWayTags(intsRef, readerWay, relFlags);
         Assertions.assertEquals(4, lanesEnc.getInt(false, intsRef));
@@ -51,7 +52,7 @@ class OSMLanesParserTest {
     @Test
     void notTagged() {
         ReaderWay readerWay = new ReaderWay(1);
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         parser.handleWayTags(intsRef, readerWay, relFlags);
         Assertions.assertEquals(1, lanesEnc.getInt(false, intsRef));
     }
