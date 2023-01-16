@@ -4,6 +4,7 @@ import com.graphhopper.routing.ev.EncodedValueLookup;
 import com.graphhopper.routing.ev.StringEncodedValue;
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.IntsRefImpl;
 import com.graphhopper.util.Helper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ public class ConditionalExpressionVisitorTest {
     public void before() {
         StringEncodedValue sev = new StringEncodedValue("country", 10);
         lookup = new EncodingManager.Builder().add(sev).build();
-        sev.setString(false, new IntsRef(1), "DEU");
+        sev.setString(false, new IntsRefImpl(1), "DEU");
     }
 
     @Test
