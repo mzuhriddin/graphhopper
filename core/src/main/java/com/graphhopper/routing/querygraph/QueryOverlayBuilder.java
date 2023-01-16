@@ -23,7 +23,6 @@ import com.graphhopper.coll.GHIntObjectHashMap;
 import com.graphhopper.search.EdgeKVStorage;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.storage.IntsRef;
-import com.graphhopper.storage.IntsRefImpl;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.*;
 import com.graphhopper.util.shapes.GHPoint;
@@ -228,7 +227,7 @@ class QueryOverlayBuilder {
         VirtualEdgeIteratorState baseEdge = new VirtualEdgeIteratorState(origEdgeKey, GHUtility.createEdgeKey(virtEdgeId, prevNodeId == nodeId, false),
                 prevNodeId, nodeId, baseDistance, closestEdge.getFlags(), keyValues, basePoints, reverse);
         VirtualEdgeIteratorState baseReverseEdge = new VirtualEdgeIteratorState(origRevEdgeKey, GHUtility.createEdgeKey(virtEdgeId, prevNodeId == nodeId, true),
-                nodeId, prevNodeId, baseDistance, IntsRefImpl.deepCopyOf((IntsRefImpl) closestEdge.getFlags()), keyValues, baseReversePoints, !reverse);
+                nodeId, prevNodeId, baseDistance, IntsRef.deepCopyOf(closestEdge.getFlags()), keyValues, baseReversePoints, !reverse);
 
         baseEdge.setReverseEdge(baseReverseEdge);
         baseReverseEdge.setReverseEdge(baseEdge);
