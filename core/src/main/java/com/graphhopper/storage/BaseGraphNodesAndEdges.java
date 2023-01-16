@@ -240,6 +240,14 @@ class BaseGraphNodesAndEdges {
         return (long) edge * edgeEntryBytes;
     }
 
+    public int getInt(long edgePointer, int index) {
+        return edges.getInt(edgePointer + E_FLAGS + index * 4);
+    }
+
+    public void setInt(long edgePointer, int index, int value) {
+        edges.setInt(edgePointer + E_FLAGS + index * 4, value);
+    }
+
     public void readFlags(long edgePointer, IntsRef edgeFlags) {
         int size = edgeFlags.size();
         for (int i = 0; i < size; ++i)
