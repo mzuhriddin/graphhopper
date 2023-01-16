@@ -584,7 +584,6 @@ public class BaseGraph implements Graph, Closeable {
             boolean baseNodeIsNodeA = baseNode == nodeA;
             adjNode = baseNodeIsNodeA ? store.getNodeB(edgePointer) : nodeA;
             reverse = !baseNodeIsNodeA;
-            refreshFlags = true;
 
             // position to next edge
             nextEdgeId = baseNodeIsNodeA ? store.getLinkA(edgePointer) : store.getLinkB(edgePointer);
@@ -621,7 +620,6 @@ public class BaseGraph implements Graph, Closeable {
             edgePointer = store.toEdgePointer(edgeId);
             baseNode = store.getNodeA(edgePointer);
             adjNode = store.getNodeB(edgePointer);
-            refreshFlags = true;
             reverse = false;
             return true;
         }
@@ -655,13 +653,10 @@ public class BaseGraph implements Graph, Closeable {
         int adjNode;
         // we need reverse if detach is called
         boolean reverse = false;
-        boolean refreshFlags;
         int edgeId = -1;
-        private final IntsRef edgeFlags;
 
         public EdgeIteratorStateImpl(BaseGraph baseGraph) {
             this.baseGraph = baseGraph;
-            this.edgeFlags = new IntsRef(baseGraph.store.getIntsForFlags());
             store = baseGraph.store;
         }
 
@@ -675,7 +670,6 @@ public class BaseGraph implements Graph, Closeable {
             edgePointer = store.toEdgePointer(edgeId);
             baseNode = store.getNodeA(edgePointer);
             adjNode = store.getNodeB(edgePointer);
-            refreshFlags = true;
 
             if (expectedAdjNode == adjNode || expectedAdjNode == Integer.MIN_VALUE) {
                 reverse = false;
@@ -700,7 +694,6 @@ public class BaseGraph implements Graph, Closeable {
             edgePointer = store.toEdgePointer(edgeId);
             baseNode = store.getNodeA(edgePointer);
             adjNode = store.getNodeB(edgePointer);
-            refreshFlags = true;
 
             if (edgeKey % 2 == 0 || baseNode == adjNode) {
                 reverse = false;
@@ -735,10 +728,8 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public IntsRef getFlags() {
-            if (refreshFlags) {
-                store.readFlags(edgePointer, edgeFlags);
-                refreshFlags = false;
-            }
+            IntsRef edgeFlags = new IntsRef(store.getIntsForFlags());
+            store.readFlags(edgePointer, edgeFlags);
             return edgeFlags;
         }
 
@@ -746,7 +737,6 @@ public class BaseGraph implements Graph, Closeable {
         public final EdgeIteratorState setFlags(IntsRef edgeFlags) {
             assert edgeId < store.getEdges() : "must be edge but was shortcut: " + edgeId + " >= " + store.getEdges() + ". Use setFlagsAndWeight";
             store.writeFlags(edgePointer, edgeFlags);
-            System.arraycopy(edgeFlags.ints, 0, this.edgeFlags.ints, 0, edgeFlags.ints.length);
             return this;
         }
 
@@ -757,8 +747,9 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public EdgeIteratorState set(BooleanEncodedValue property, boolean value) {
-            property.setBool(reverse, getFlags(), value);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setBool(reverse, flags, value);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -769,8 +760,9 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public EdgeIteratorState setReverse(BooleanEncodedValue property, boolean value) {
-            property.setBool(!reverse, getFlags(), value);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setBool(!reverse, flags, value);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -778,9 +770,10 @@ public class BaseGraph implements Graph, Closeable {
         public EdgeIteratorState set(BooleanEncodedValue property, boolean fwd, boolean bwd) {
             if (!property.isStoreTwoDirections())
                 throw new IllegalArgumentException("EncodedValue " + property.getName() + " supports only one direction");
-            property.setBool(reverse, getFlags(), fwd);
-            property.setBool(!reverse, getFlags(), bwd);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setBool(reverse, flags, fwd);
+            property.setBool(!reverse, flags, bwd);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -791,8 +784,9 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public EdgeIteratorState set(IntEncodedValue property, int value) {
-            property.setInt(reverse, getFlags(), value);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setInt(reverse, flags, value);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -803,8 +797,9 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public EdgeIteratorState setReverse(IntEncodedValue property, int value) {
-            property.setInt(!reverse, getFlags(), value);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setInt(!reverse, flags, value);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -812,9 +807,10 @@ public class BaseGraph implements Graph, Closeable {
         public EdgeIteratorState set(IntEncodedValue property, int fwd, int bwd) {
             if (!property.isStoreTwoDirections())
                 throw new IllegalArgumentException("EncodedValue " + property.getName() + " supports only one direction");
-            property.setInt(reverse, getFlags(), fwd);
-            property.setInt(!reverse, getFlags(), bwd);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setInt(reverse, flags, fwd);
+            property.setInt(!reverse, flags, bwd);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -825,8 +821,9 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public EdgeIteratorState set(DecimalEncodedValue property, double value) {
-            property.setDecimal(reverse, getFlags(), value);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setDecimal(reverse, flags, value);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -837,8 +834,9 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public EdgeIteratorState setReverse(DecimalEncodedValue property, double value) {
-            property.setDecimal(!reverse, getFlags(), value);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setDecimal(!reverse, flags, value);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -846,9 +844,10 @@ public class BaseGraph implements Graph, Closeable {
         public EdgeIteratorState set(DecimalEncodedValue property, double fwd, double bwd) {
             if (!property.isStoreTwoDirections())
                 throw new IllegalArgumentException("EncodedValue " + property.getName() + " supports only one direction");
-            property.setDecimal(reverse, getFlags(), fwd);
-            property.setDecimal(!reverse, getFlags(), bwd);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setDecimal(reverse, flags, fwd);
+            property.setDecimal(!reverse, flags, bwd);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -859,8 +858,9 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public <T extends Enum<?>> EdgeIteratorState set(EnumEncodedValue<T> property, T value) {
-            property.setEnum(reverse, getFlags(), value);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setEnum(reverse, flags, value);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -871,8 +871,9 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public <T extends Enum<?>> EdgeIteratorState setReverse(EnumEncodedValue<T> property, T value) {
-            property.setEnum(!reverse, getFlags(), value);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setEnum(!reverse, flags, value);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -880,9 +881,10 @@ public class BaseGraph implements Graph, Closeable {
         public <T extends Enum<?>> EdgeIteratorState set(EnumEncodedValue<T> property, T fwd, T bwd) {
             if (!property.isStoreTwoDirections())
                 throw new IllegalArgumentException("EncodedValue " + property.getName() + " supports only one direction");
-            property.setEnum(reverse, getFlags(), fwd);
-            property.setEnum(!reverse, getFlags(), bwd);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setEnum(reverse, flags, fwd);
+            property.setEnum(!reverse, flags, bwd);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -893,8 +895,9 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public EdgeIteratorState set(StringEncodedValue property, String value) {
-            property.setString(reverse, getFlags(), value);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setString(reverse, flags, value);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -905,8 +908,9 @@ public class BaseGraph implements Graph, Closeable {
 
         @Override
         public EdgeIteratorState setReverse(StringEncodedValue property, String value) {
-            property.setString(!reverse, getFlags(), value);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setString(!reverse, flags, value);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
@@ -914,9 +918,10 @@ public class BaseGraph implements Graph, Closeable {
         public EdgeIteratorState set(StringEncodedValue property, String fwd, String bwd) {
             if (!property.isStoreTwoDirections())
                 throw new IllegalArgumentException("EncodedValue " + property.getName() + " supports only one direction");
-            property.setString(reverse, getFlags(), fwd);
-            property.setString(!reverse, getFlags(), bwd);
-            store.writeFlags(edgePointer, getFlags());
+            IntsRef flags = getFlags();
+            property.setString(reverse, flags, fwd);
+            property.setString(!reverse, flags, bwd);
+            store.writeFlags(edgePointer, flags);
             return this;
         }
 
