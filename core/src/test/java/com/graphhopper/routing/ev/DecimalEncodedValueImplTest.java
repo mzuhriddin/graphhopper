@@ -1,6 +1,7 @@
 package com.graphhopper.routing.ev;
 
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.IntsRefImpl;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -14,7 +15,7 @@ public class DecimalEncodedValueImplTest {
         DecimalEncodedValueImpl testEnc = new DecimalEncodedValueImpl("test", 3, 1, false);
         testEnc.init(new EncodedValue.InitializerConfig());
 
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         assertEquals(0, testEnc.getDecimal(false, intsRef), .1);
 
         testEnc.setDecimal(false, intsRef, 7);
@@ -25,7 +26,7 @@ public class DecimalEncodedValueImplTest {
     public void setMaxToInfinity() {
         DecimalEncodedValueImpl testEnc = new DecimalEncodedValueImpl("test", 3, 0, 1, false, false, true);
         testEnc.init(new EncodedValue.InitializerConfig());
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         assertEquals(0, testEnc.getDecimal(false, intsRef), .1);
 
         assertTrue(Double.isInfinite(testEnc.getMaxOrMaxStorableDecimal()));
@@ -49,7 +50,7 @@ public class DecimalEncodedValueImplTest {
     public void testNegative() {
         DecimalEncodedValueImpl testEnc = new DecimalEncodedValueImpl("test", 3, -6, 0.1, false, false, true);
         testEnc.init(new EncodedValue.InitializerConfig());
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         // a bit ugly: the default is the minimum not 0
         assertEquals(-6, testEnc.getDecimal(false, intsRef), .1);
 
@@ -67,7 +68,7 @@ public class DecimalEncodedValueImplTest {
     public void testInfinityWithMinValue() {
         DecimalEncodedValueImpl testEnc = new DecimalEncodedValueImpl("test", 3, -6, 0.1, false, false, true);
         testEnc.init(new EncodedValue.InitializerConfig());
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         testEnc.setDecimal(false, intsRef, Double.POSITIVE_INFINITY);
         assertEquals(Double.POSITIVE_INFINITY, testEnc.getDecimal(false, intsRef), .1);
     }
@@ -76,7 +77,7 @@ public class DecimalEncodedValueImplTest {
     public void testNegateReverse() {
         DecimalEncodedValueImpl testEnc = new DecimalEncodedValueImpl("test", 4, 0, 0.5, true, false, false);
         testEnc.init(new EncodedValue.InitializerConfig());
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         testEnc.setDecimal(false, intsRef, 5.5);
         assertEquals(5.5, testEnc.getDecimal(false, intsRef), .1);
         assertEquals(-5.5, testEnc.getDecimal(true, intsRef), .1);
@@ -89,7 +90,7 @@ public class DecimalEncodedValueImplTest {
         new DecimalEncodedValueImpl("tmp1", 5, 1, false).init(config);
         testEnc = new DecimalEncodedValueImpl("tmp2", 5, 0, 1, true, false, false);
         testEnc.init(config);
-        intsRef = new IntsRef(1);
+        intsRef = new IntsRefImpl(1);
         testEnc.setDecimal(true, intsRef, 2.6);
         assertEquals(-3, testEnc.getDecimal(false, intsRef), .1);
         assertEquals(3, testEnc.getDecimal(true, intsRef), .1);
@@ -103,7 +104,7 @@ public class DecimalEncodedValueImplTest {
     public void testNextStorableValue() {
         DecimalEncodedValueImpl enc = new DecimalEncodedValueImpl("test", 4, 3, false);
         enc.init(new EncodedValue.InitializerConfig());
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
 
         // some values can be stored...
         enc.setDecimal(false, intsRef, 3);
@@ -154,7 +155,7 @@ public class DecimalEncodedValueImplTest {
     private void assertSmallestNonZeroValue(DecimalEncodedValueImpl enc, double expected) {
         enc.init(new EncodedValue.InitializerConfig());
         assertEquals(expected, enc.getSmallestNonZeroValue());
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         enc.setDecimal(false, intsRef, enc.getSmallestNonZeroValue());
         assertEquals(expected, enc.getDecimal(false, intsRef));
         enc.setDecimal(false, intsRef, enc.getSmallestNonZeroValue() / 2 - 0.01);
@@ -171,7 +172,7 @@ public class DecimalEncodedValueImplTest {
         assertEquals(Double.POSITIVE_INFINITY, enc.getNextStorableValue(42.1));
         assertEquals(Double.POSITIVE_INFINITY, enc.getNextStorableValue(45));
         assertEquals(Double.POSITIVE_INFINITY, enc.getNextStorableValue(45.1));
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         enc.setDecimal(false, intsRef, 45);
         assertEquals(42, enc.getDecimal(false, intsRef));
 
@@ -184,7 +185,7 @@ public class DecimalEncodedValueImplTest {
         DecimalEncodedValueImpl enc = new DecimalEncodedValueImpl("test", 4, 0, 3, true, false, false);
         enc.init(new EncodedValue.InitializerConfig());
         assertEquals(15 * 3, enc.getMaxOrMaxStorableDecimal());
-        IntsRef ints = new IntsRef(1);
+        IntsRef ints = new IntsRefImpl(1);
         enc.setDecimal(false, ints, 3);
         assertEquals(3, enc.getDecimal(false, ints));
         assertEquals(3, enc.getMaxOrMaxStorableDecimal());
@@ -203,7 +204,7 @@ public class DecimalEncodedValueImplTest {
         enc.init(new EncodedValue.InitializerConfig());
         assertEquals(3.2, enc.getMaxStorableDecimal());
 
-        IntsRef flags = new IntsRef(1);
+        IntsRef flags = new IntsRefImpl(1);
         enc.setDecimal(true, flags, 1.6);
         assertEquals(1.6, enc.getDecimal(true, flags));
     }

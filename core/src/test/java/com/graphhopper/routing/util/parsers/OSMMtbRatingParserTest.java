@@ -23,6 +23,7 @@ import com.graphhopper.routing.ev.EncodedValue;
 import com.graphhopper.routing.ev.IntEncodedValue;
 import com.graphhopper.routing.ev.MtbRating;
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.IntsRefImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,11 +60,11 @@ class OSMMtbRatingParserTest {
         IntEncodedValue ev = MtbRating.create();
         ev.init(new EncodedValue.InitializerConfig());
         OSMMtbRatingParser parser = new OSMMtbRatingParser(ev);
-        IntsRef edgeFlags = new IntsRef(1);
+        IntsRef edgeFlags = new IntsRefImpl(1);
         ReaderWay way = new ReaderWay(0);
         if (scaleString != null)
             way.setTag("mtb:scale", scaleString);
-        parser.handleWayTags(edgeFlags, way, new IntsRef(2));
+        parser.handleWayTags(edgeFlags, way, new IntsRefImpl(2));
         assertEquals(expectedRating, ev.getInt(false, edgeFlags), "unexpected rating for mtb:scale=" + scaleString);
     }
 

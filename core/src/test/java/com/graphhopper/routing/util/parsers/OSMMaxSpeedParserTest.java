@@ -24,6 +24,7 @@ import com.graphhopper.routing.ev.MaxSpeed;
 import com.graphhopper.routing.util.TransportationMode;
 import com.graphhopper.routing.util.countryrules.CountryRule;
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.IntsRefImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +36,7 @@ class OSMMaxSpeedParserTest {
         DecimalEncodedValue maxSpeedEnc = MaxSpeed.create();
         maxSpeedEnc.init(new EncodedValue.InitializerConfig());
         OSMMaxSpeedParser parser = new OSMMaxSpeedParser(maxSpeedEnc);
-        IntsRef relFlags = new IntsRef(2);
+        IntsRef relFlags = new IntsRefImpl(2);
         ReaderWay way = new ReaderWay(29L);
         way.setTag("highway", "living_street");
         way.setTag("country_rule", new CountryRule() {
@@ -44,12 +45,12 @@ class OSMMaxSpeedParserTest {
                 return 5;
             }
         });
-        IntsRef edgeFlags = new IntsRef(1);
+        IntsRef edgeFlags = new IntsRefImpl(1);
         parser.handleWayTags(edgeFlags, way, relFlags);
         assertEquals(5, maxSpeedEnc.getDecimal(false, edgeFlags), .1);
 
         // without a country_rule we get the default value
-        edgeFlags = new IntsRef(1);
+        edgeFlags = new IntsRefImpl(1);
         way.removeTag("country_rule");
         parser.handleWayTags(edgeFlags, way, relFlags);
         assertEquals(MaxSpeed.UNSET_SPEED, maxSpeedEnc.getDecimal(false, edgeFlags), .1);

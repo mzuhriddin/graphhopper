@@ -146,7 +146,7 @@ public abstract class AbstractGraphStorageTester {
     @Test
     public void testPropertiesWithNoInit() {
         graph = createGHStorage();
-        assertEquals(0, graph.edge(0, 1).getFlags().ints[0]);
+        assertEquals(0, graph.edge(0, 1).getFlags().getInt(0));
         assertEquals(0, graph.edge(0, 2).getDistance(), 1e-6);
     }
 
@@ -679,10 +679,10 @@ public abstract class AbstractGraphStorageTester {
 
         EdgeIteratorState edge = graph.edge(0, 1);
         IntsRef intsRef = manager.createEdgeFlags();
-        intsRef.ints[0] = Integer.MAX_VALUE / 3;
+        intsRef.setInt(0, Integer.MAX_VALUE / 3);
         edge.setFlags(intsRef);
         // System.out.println(BitUtil.LITTLE.toBitString(Long.MAX_VALUE / 3) + "\n" + BitUtil.LITTLE.toBitString(edge.getFlags()));
-        assertEquals(Integer.MAX_VALUE / 3, edge.getFlags().ints[0]);
+        assertEquals(Integer.MAX_VALUE / 3, edge.getFlags().getInt(0));
         graph.close();
 
         graph = new BaseGraph.Builder(manager).create();
