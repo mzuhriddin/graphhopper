@@ -27,6 +27,7 @@ import com.graphhopper.resources.MapMatchingResource;
 import com.graphhopper.routing.querygraph.VirtualEdgeIteratorState;
 import com.graphhopper.search.EdgeKVStorage;
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.IntsRefImpl;
 import com.graphhopper.storage.index.Snap;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
