@@ -1,7 +1,6 @@
 package com.graphhopper.routing.ev;
 
 import com.graphhopper.storage.IntsRef;
-import com.graphhopper.storage.IntsRefImpl;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -59,7 +58,7 @@ public class StringEncodedValueTest {
         StringEncodedValue prop = new StringEncodedValue("country", 3);
         prop.init(new EncodedValue.InitializerConfig());
 
-        IntsRef ref = new IntsRefImpl(1);
+        IntsRef ref = new IntsRef(1);
         prop.setString(false, ref, null);
         assertEquals(0, prop.getValues().size());
     }
@@ -81,7 +80,7 @@ public class StringEncodedValueTest {
         StringEncodedValue prop = new StringEncodedValue("country", 3);
         prop.init(new EncodedValue.InitializerConfig());
 
-        IntsRef ref = new IntsRefImpl(1);
+        IntsRef ref = new IntsRef(1);
         assertEquals(null, prop.getString(false, ref));
         assertEquals(0, prop.getValues().size());
 
@@ -107,7 +106,7 @@ public class StringEncodedValueTest {
         StringEncodedValue prop = new StringEncodedValue("country", 3);
         prop.init(new EncodedValue.InitializerConfig());
 
-        IntsRef ref = new IntsRefImpl(1);
+        IntsRef ref = new IntsRef(1);
         assertEquals(null, prop.getString(false, ref));
 
         prop.setString(false, ref, "aut");
