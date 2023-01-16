@@ -2,6 +2,7 @@ package com.graphhopper.routing.ev;
 
 import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.IntsRefImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +14,7 @@ public class DecimalEncodedValueTest {
     public void testInit() {
         DecimalEncodedValue prop = new DecimalEncodedValueImpl("test", 10, 2, false);
         prop.init(new EncodedValue.InitializerConfig());
-        IntsRef ref = new IntsRef(1);
+        IntsRef ref = new IntsRefImpl(1);
         prop.setDecimal(false, ref, 10d);
         assertEquals(10d, prop.getDecimal(false, ref), 0.1);
     }
@@ -31,6 +32,6 @@ public class DecimalEncodedValueTest {
     public void testNegativeBounds() {
         DecimalEncodedValue prop = new DecimalEncodedValueImpl("test", 10, 5, false);
         prop.init(new EncodedValue.InitializerConfig());
-        assertThrows(Exception.class, () -> prop.setDecimal(false, new IntsRef(1), -1));
+        assertThrows(Exception.class, () -> prop.setDecimal(false, new IntsRefImpl(1), -1));
     }
 }

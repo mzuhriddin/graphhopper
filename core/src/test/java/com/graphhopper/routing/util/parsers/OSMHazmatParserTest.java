@@ -5,6 +5,7 @@ import com.graphhopper.routing.ev.EncodedValue;
 import com.graphhopper.routing.ev.EnumEncodedValue;
 import com.graphhopper.routing.ev.Hazmat;
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.IntsRefImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,28 +20,28 @@ public class OSMHazmatParserTest {
     public void setUp() {
         hazEnc.init(new EncodedValue.InitializerConfig());
         parser = new OSMHazmatParser(hazEnc);
-        relFlags = new IntsRef(2);
+        relFlags = new IntsRefImpl(2);
     }
 
     @Test
     public void testSimpleTags() {
         ReaderWay readerWay = new ReaderWay(1);
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         readerWay.setTag("hazmat", "no");
         parser.handleWayTags(intsRef, readerWay, relFlags);
         assertEquals(Hazmat.NO, hazEnc.getEnum(false, intsRef));
 
-        intsRef = new IntsRef(1);
+        intsRef = new IntsRefImpl(1);
         readerWay.setTag("hazmat", "yes");
         parser.handleWayTags(intsRef, readerWay, relFlags);
         assertEquals(Hazmat.YES, hazEnc.getEnum(false, intsRef));
 
-        intsRef = new IntsRef(1);
+        intsRef = new IntsRefImpl(1);
         readerWay.setTag("hazmat", "designated");
         parser.handleWayTags(intsRef, readerWay, relFlags);
         assertEquals(Hazmat.YES, hazEnc.getEnum(false, intsRef));
 
-        intsRef = new IntsRef(1);
+        intsRef = new IntsRefImpl(1);
         readerWay.setTag("hazmat", "designated");
         parser.handleWayTags(intsRef, readerWay, relFlags);
         assertEquals(Hazmat.YES, hazEnc.getEnum(false, intsRef));
@@ -49,7 +50,7 @@ public class OSMHazmatParserTest {
     @Test
     public void testNoNPE() {
         ReaderWay readerWay = new ReaderWay(1);
-        IntsRef intsRef = new IntsRef(1);
+        IntsRef intsRef = new IntsRefImpl(1);
         parser.handleWayTags(intsRef, readerWay, relFlags);
         assertEquals(Hazmat.YES, hazEnc.getEnum(false, intsRef));
     }

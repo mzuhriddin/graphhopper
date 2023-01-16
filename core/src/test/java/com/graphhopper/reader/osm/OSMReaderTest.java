@@ -499,7 +499,7 @@ public class OSMReaderTest {
         assertFalse(flags.isEmpty());
 
         // unchanged network
-        IntsRef before = IntsRef.deepCopyOf(flags);
+        IntsRef before = IntsRefImpl.deepCopyOf((IntsRefImpl) flags);
         osmParsers.handleRelationTags(osmRel, flags);
         assertEquals(before, flags);
 
