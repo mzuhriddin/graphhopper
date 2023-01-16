@@ -5,6 +5,7 @@ import com.graphhopper.routing.ev.AverageSlope;
 import com.graphhopper.routing.ev.DecimalEncodedValue;
 import com.graphhopper.routing.ev.MaxSlope;
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.IntsRefImpl;
 import com.graphhopper.util.PointList;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,7 @@ class SlopeCalculatorTest {
         DecimalEncodedValue maxEnc = MaxSlope.create();
         new EncodingManager.Builder().add(averageEnc).add(maxEnc).build();
         SlopeCalculator creator = new SlopeCalculator(maxEnc, averageEnc);
-        IntsRef edgeRef = new IntsRef(1);
+        IntsRef edgeRef = new IntsRefImpl(1);
         ReaderWay way = new ReaderWay(1L);
         PointList pointList = new PointList(5, true);
         pointList.add(51.0, 12.001, 0);
@@ -26,7 +27,7 @@ class SlopeCalculatorTest {
         pointList.add(51.0, 12.003, 4); // ~140m
         pointList.add(51.0, 12.004, 2); // ~210m
         way.setTag("point_list", pointList);
-        creator.handleWayTags(edgeRef, way, IntsRef.EMPTY);
+        creator.handleWayTags(edgeRef, way, IntsRefImpl.EMPTY);
 
         assertEquals(Math.round(2.0 / 210 * 100), averageEnc.getDecimal(false, edgeRef), 1e-3);
         assertEquals(-Math.round(2.0 / 210 * 100), averageEnc.getDecimal(true, edgeRef), 1e-3);
@@ -42,7 +43,7 @@ class SlopeCalculatorTest {
         DecimalEncodedValue maxEnc = MaxSlope.create();
         new EncodingManager.Builder().add(averageEnc).add(maxEnc).build();
         SlopeCalculator creator = new SlopeCalculator(maxEnc, averageEnc);
-        IntsRef edgeRef = new IntsRef(1);
+        IntsRef edgeRef = new IntsRefImpl(1);
         ReaderWay way = new ReaderWay(1L);
         PointList pointList = new PointList(5, true);
         pointList.add(51.0, 12.0010, 10);
@@ -51,7 +52,7 @@ class SlopeCalculatorTest {
         pointList.add(51.0, 12.0054, 0); // 140m
         pointList.add(51.0, 12.0070, 7); // 112m
         way.setTag("point_list", pointList);
-        creator.handleWayTags(edgeRef, way, IntsRef.EMPTY);
+        creator.handleWayTags(edgeRef, way, IntsRefImpl.EMPTY);
 
         assertEquals(Math.round(8.0 / 210 * 100), maxEnc.getDecimal(false, edgeRef), 1e-3);
         assertEquals(Math.round(8.0 / 210 * 100), maxEnc.getDecimal(true, edgeRef), 1e-3);
@@ -65,19 +66,19 @@ class SlopeCalculatorTest {
         pointList.add(47.7283135, 11.9991135, 1178.0);
         ReaderWay way = new ReaderWay(1);
         way.setTag("point_list", pointList);
-        IntsRef edgeRef = new IntsRef(1);
+        IntsRef edgeRef = new IntsRefImpl(1);
         DecimalEncodedValue averageEnc = AverageSlope.create();
         DecimalEncodedValue maxEnc = MaxSlope.create();
         new EncodingManager.Builder().add(averageEnc).add(maxEnc).build();
         SlopeCalculator creator = new SlopeCalculator(maxEnc, averageEnc);
-        creator.handleWayTags(edgeRef, way, IntsRef.EMPTY);
+        creator.handleWayTags(edgeRef, way, IntsRefImpl.EMPTY);
         assertEquals(31, maxEnc.getDecimal(false, edgeRef), 1e-3);
         assertEquals(31, averageEnc.getDecimal(false, edgeRef), 1e-3);
     }
 
     @Test
     public void test2D() {
-        IntsRef edgeRef = new IntsRef(1);
+        IntsRef edgeRef = new IntsRefImpl(1);
         PointList pointList = new PointList(5, false);
         pointList.add(47.7283135, 11.9991135);
         ReaderWay way = new ReaderWay(1);
@@ -87,7 +88,7 @@ class SlopeCalculatorTest {
         new EncodingManager.Builder().add(averageEnc).add(maxEnc).build();
 
         SlopeCalculator creator = new SlopeCalculator(maxEnc, averageEnc);
-        creator.handleWayTags(edgeRef, way, IntsRef.EMPTY);
+        creator.handleWayTags(edgeRef, way, IntsRefImpl.EMPTY);
         assertEquals(0, maxEnc.getDecimal(false, edgeRef), 1e-3);
         assertEquals(0, averageEnc.getDecimal(false, edgeRef), 1e-3);
     }

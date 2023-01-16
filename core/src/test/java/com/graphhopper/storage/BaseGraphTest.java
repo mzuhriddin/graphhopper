@@ -222,9 +222,9 @@ public class BaseGraphTest extends AbstractGraphStorageTester {
         BaseGraph storage = createGHStorage();
         Graph graph = storage.getBaseGraph();
         IntsRef ref = encodingManager.createEdgeFlags();
-        ref.ints[0] = 12;
+        ref.setInt(0, 12);
         GHUtility.setSpeed(60, true, true, carAccessEnc, carSpeedEnc, graph.edge(1, 2).setDistance(10)).setFlags(ref);
-        ref.ints[0] = 13;
+        ref.setInt(0, 13);
         GHUtility.setSpeed(60, true, true, carAccessEnc, carSpeedEnc, graph.edge(1, 3).setDistance(10)).setFlags(ref);
 
         EdgeIterator iter = graph.createEdgeExplorer().setBaseNode(1);
@@ -232,11 +232,11 @@ public class BaseGraphTest extends AbstractGraphStorageTester {
         EdgeIteratorState edge1 = iter.detach(false);
 
         assertTrue(iter.next());
-        ref.ints[0] = 44;
+        ref.setInt(0, 44);
         iter.setFlags(ref);
 
-        assertEquals(44, iter.getFlags().ints[0]);
-        assertEquals(13, edge1.getFlags().ints[0]);
+        assertEquals(44, iter.getFlags().getInt(0));
+        assertEquals(13, edge1.getFlags().getInt(0));
     }
 
     @Test
@@ -286,13 +286,13 @@ public class BaseGraphTest extends AbstractGraphStorageTester {
     public void setGetFlagsRaw() {
         BaseGraph graph = new BaseGraph.Builder(1).create();
         EdgeIteratorState edge = graph.edge(0, 1);
-        IntsRef flags = new IntsRef(graph.getIntsForFlags());
-        flags.ints[0] = 10;
+        IntsRef flags = new IntsRefImpl(graph.getIntsForFlags());
+        flags.setInt(0, 10);
         edge.setFlags(flags);
-        assertEquals(10, edge.getFlags().ints[0]);
-        flags.ints[0] = 9;
+        assertEquals(10, edge.getFlags().getInt(0));
+        flags.setInt(0, 9);
         edge.setFlags(flags);
-        assertEquals(9, edge.getFlags().ints[0]);
+        assertEquals(9, edge.getFlags().getInt(0));
     }
 
     @Test

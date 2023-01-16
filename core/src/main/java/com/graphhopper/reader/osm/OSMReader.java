@@ -110,7 +110,7 @@ public class OSMReader {
         turnCostStorage = baseGraph.getTurnCostStorage();
 
         tempRelFlags = osmParsers.createRelationFlags();
-        if (tempRelFlags.length != 2)
+        if (tempRelFlags.size() != 2)
             // we use a long to store relation flags currently, so the relation flags ints ref must have length 2
             throw new IllegalArgumentException("OSMReader cannot use relation flags with != 2 integers");
     }
@@ -616,13 +616,13 @@ public class OSMReader {
 
     IntsRef getRelFlagsMap(long osmId) {
         long relFlagsAsLong = osmWayIdToRelationFlagsMap.get(osmId);
-        tempRelFlags.ints[0] = (int) relFlagsAsLong;
-        tempRelFlags.ints[1] = (int) (relFlagsAsLong >> 32);
+        tempRelFlags.setInt(0, (int) relFlagsAsLong);
+        tempRelFlags.setInt(1, (int) (relFlagsAsLong >> 32));
         return tempRelFlags;
     }
 
     void putRelFlagsMap(long osmId, IntsRef relFlags) {
-        long relFlagsAsLong = ((long) relFlags.ints[1] << 32) | (relFlags.ints[0] & 0xFFFFFFFFL);
+        long relFlagsAsLong = ((long) relFlags.getInt(1) << 32) | (relFlags.getInt(0) & 0xFFFFFFFFL);
         osmWayIdToRelationFlagsMap.put(osmId, relFlagsAsLong);
     }
 

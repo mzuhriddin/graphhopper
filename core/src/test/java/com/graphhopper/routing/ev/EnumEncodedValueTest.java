@@ -1,6 +1,7 @@
 package com.graphhopper.routing.ev;
 
 import com.graphhopper.storage.IntsRef;
+import com.graphhopper.storage.IntsRefImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,9 +16,9 @@ public class EnumEncodedValueTest {
         assertEquals(5, prop.bits);
         assertEquals(0, init.dataIndex);
         assertEquals(0, init.shift);
-        IntsRef ref = new IntsRef(1);
+        IntsRef ref = new IntsRefImpl(1);
         // default if empty
-        ref.ints[0] = 0;
+        ref.setInt(0, 0);
         assertEquals(RoadClass.OTHER, prop.getEnum(false, ref));
 
         prop.setEnum(false, ref, RoadClass.SECONDARY);
