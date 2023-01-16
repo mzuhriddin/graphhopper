@@ -136,6 +136,7 @@ class BaseGraphNodesAndEdges {
         final int edgeAttributesVersion = edgeAttributes.getHeader(0 * 4);
         GHUtility.checkDAVersion("edge_attributes", Constants.VERSION_EDGE_ATTRIBUTES, edgeAttributesVersion);
         edgeAttributeBytes = edgeAttributes.getHeader(1 * 4);
+
         return true;
     }
 
