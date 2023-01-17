@@ -41,6 +41,7 @@ public class GraphSpeedMeasurement {
             GraphHopperConfig ghConfig = new GraphHopperConfig()
                     .putObject("datareader.file", args.getString("map", "map-matching/files/leipzig_germany.osm.pbf"))
                     .putObject("graph.location", args.getString("location", "graph-speed-measurement") + "-" + speedBits + "-gh")
+                    .putObject("graph.dataaccess", args.getString("da", "RAM_STORE"))
                     .putObject("import.osm.ignored_highways", "")
                     .putObject("graph.vehicles", String.format("roads|speed_bits=%d,car|speed_bits=%d,bike|speed_bits=%d,foot|speed_bits=%d", speedBits, speedBits, speedBits, speedBits))
                     .setProfiles(Arrays.asList(
@@ -60,7 +61,7 @@ public class GraphSpeedMeasurement {
             EdgeExplorer explorer = baseGraph.createEdgeExplorer();
             Random rnd = new Random(123);
 
-            final int iterations = args.getInt("iters", 1_000_000);
+            final int iterations = args.getInt("iters", 10_000_000);
             MiniPerfTest t = new MiniPerfTest().setIterations(iterations)
                     .start((warmup, run) -> {
                         EdgeIterator iter = explorer.setBaseNode(rnd.nextInt(baseGraph.getNodes()));
