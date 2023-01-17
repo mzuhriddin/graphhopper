@@ -36,7 +36,7 @@ public class GraphSpeedMeasurement {
     public static void main(String[] strs) {
         PMap args = PMap.read(strs);
         List<String> result = new ArrayList<>();
-        for (int speedBits = 7; speedBits <= 31; speedBits++) {
+        for (int speedBits = 7; speedBits <= 31; speedBits += 3) {
             System.out.println("Running measurement for speedBits=" + speedBits);
             GraphHopperConfig ghConfig = new GraphHopperConfig()
                     .putObject("datareader.file", args.getString("map", "map-matching/files/leipzig_germany.osm.pbf"))
@@ -75,7 +75,7 @@ public class GraphSpeedMeasurement {
                         return (int) sum;
                     });
             result.add(String.format("bits: %d, ints: %d, took: %.2fms, checksum: %d", speedBits, em.getIntsForFlags(), t.getSum(), t.getDummySum()));
-            System.out.println(result.get(result.size()-1));
+            System.out.println(result.get(result.size() - 1));
         }
         System.out.println();
         System.out.println("### RESULT ###");
