@@ -31,15 +31,6 @@ public final class IntsRef implements Comparable<IntsRef> {
      */
     public final int[] ints;
     /**
-     * Offset of first valid integer.
-     */
-    public final int offset;
-    /**
-     * Length of used ints.
-     */
-    public final int length;
-
-    /**
      * Create a IntsRef pointing to a new int array of size <code>capacity</code> leading to capacity*32 bits.
      * Offset will be zero and length will be the capacity.
      */
@@ -51,18 +42,14 @@ public final class IntsRef implements Comparable<IntsRef> {
         if (checked && capacity == 0)
             throw new IllegalArgumentException("Use instance EMPTY instead of capacity 0");
         ints = new int[capacity];
-        length = capacity;
-        offset = 0;
     }
 
     /**
      * This instance will directly reference ints w/o making a copy.
      * ints should not be null.
      */
-    public IntsRef(int[] ints, int offset, int length) {
+    public IntsRef(int[] ints) {
         this.ints = ints;
-        this.offset = offset;
-        this.length = length;
         assert isValid();
     }
 
@@ -70,8 +57,8 @@ public final class IntsRef implements Comparable<IntsRef> {
     public int hashCode() {
         final int prime = 31;
         int result = 0;
-        final int end = offset + length;
-        for (int i = offset; i < end; i++) {
+        final int end = ints.length;
+        for (int i = 0; i < end; i++) {
             result = prime * result + ints[i];
         }
         return result;
@@ -89,11 +76,11 @@ public final class IntsRef implements Comparable<IntsRef> {
     }
 
     public boolean intsEquals(IntsRef other) {
-        if (length == other.length) {
-            int otherUpto = other.offset;
+        if (ints.length == other.ints.length) {
+            int otherUpto = 0;
             final int[] otherInts = other.ints;
-            final int end = offset + length;
-            for (int upto = offset; upto < end; upto++, otherUpto++) {
+            final int end = ints.length;
+            for (int upto = 0; upto < end; upto++, otherUpto++) {
                 if (ints[upto] != otherInts[otherUpto]) {
                     return false;
                 }
@@ -111,10 +98,10 @@ public final class IntsRef implements Comparable<IntsRef> {
     public int compareTo(IntsRef other) {
         if (this == other) return 0;
         final int[] aInts = this.ints;
-        int aUpto = this.offset;
+        int aUpto = 0;
         final int[] bInts = other.ints;
-        int bUpto = other.offset;
-        final int aStop = aUpto + Math.min(this.length, other.length);
+        int bUpto = 0;
+        final int aStop = aUpto + Math.min(this.ints.length, other.ints.length);
         while (aUpto < aStop) {
             int aInt = aInts[aUpto++];
             int bInt = bInts[bUpto++];
@@ -125,7 +112,7 @@ public final class IntsRef implements Comparable<IntsRef> {
             }
         }
         // One is a prefix of the other, or, they are equal:
-        return this.length - other.length;
+        return this.ints.length - other.ints.length;
     }
 
     /**
@@ -136,7 +123,7 @@ public final class IntsRef implements Comparable<IntsRef> {
      * and an offset of zero.
      */
     public static IntsRef deepCopyOf(IntsRef other) {
-        return new IntsRef(Arrays.copyOfRange(other.ints, other.offset, other.offset + other.length), 0, other.length);
+        return new IntsRef(Arrays.copyOf(other.ints, other.ints.length));
     }
 
     /**
@@ -147,24 +134,6 @@ public final class IntsRef implements Comparable<IntsRef> {
         if (ints == null) {
             throw new IllegalStateException("ints is null");
         }
-        if (length < 0) {
-            throw new IllegalStateException("length is negative: " + length);
-        }
-        if (length > ints.length) {
-            throw new IllegalStateException("length is out of bounds: " + length + ",ints.length=" + ints.length);
-        }
-        if (offset < 0) {
-            throw new IllegalStateException("offset is negative: " + offset);
-        }
-        if (offset > ints.length) {
-            throw new IllegalStateException("offset out of bounds: " + offset + ",ints.length=" + ints.length);
-        }
-        if (offset + length < 0) {
-            throw new IllegalStateException("offset+length is negative: offset=" + offset + ",length=" + length);
-        }
-        if (offset + length > ints.length) {
-            throw new IllegalStateException("offset+length out of bounds: offset=" + offset + ",length=" + length + ",ints.length=" + ints.length);
-        }
         return true;
     }
 
@@ -172,9 +141,9 @@ public final class IntsRef implements Comparable<IntsRef> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[');
-        final int end = offset + length;
-        for (int i = offset; i < end; i++) {
-            if (i > offset) {
+        final int end = ints.length;
+        for (int i = 0; i < end; i++) {
+            if (i > 0) {
                 sb.append(' ');
             }
             sb.append(Integer.toHexString(ints[i]));

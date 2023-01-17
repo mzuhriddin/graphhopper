@@ -110,7 +110,7 @@ public class OSMReader {
         turnCostStorage = baseGraph.getTurnCostStorage();
 
         tempRelFlags = osmParsers.createRelationFlags();
-        if (tempRelFlags.length != 2)
+        if (tempRelFlags.ints.length != 2)
             // we use a long to store relation flags currently, so the relation flags ints ref must have length 2
             throw new IllegalArgumentException("OSMReader cannot use relation flags with != 2 integers");
     }
