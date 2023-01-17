@@ -25,7 +25,6 @@ import com.graphhopper.routing.ev.EncodedValue;
 import com.graphhopper.routing.util.parsers.RelationTagParser;
 import com.graphhopper.routing.util.parsers.TagParser;
 import com.graphhopper.storage.IntsRef;
-import com.graphhopper.storage.IntsRefImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +105,7 @@ public class OSMParsers {
         int requiredInts = relConfig.getRequiredInts();
         if (requiredInts > 2)
             throw new IllegalStateException("More than two ints are needed for relation flags, but OSMReader does not allow this");
-        return new IntsRefImpl(2);
+        return new IntsRef(2);
     }
 
     public List<String> getIgnoredHighways() {

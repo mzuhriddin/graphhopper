@@ -100,7 +100,7 @@ public class TurnCostStorage {
         int newEntryIndex = turnCostsCount;
         ensureTurnCostIndex(newEntryIndex);
         boolean oldEntryFound = false;
-        int newFlags = tcFlags.getInt(0);
+        int newFlags = tcFlags.ints[0];
         int next = NO_TURN_ENTRY;
 
         // determine if we already have a cost entry for this node
@@ -182,7 +182,7 @@ public class TurnCostStorage {
             long turnCostPtr = (long) turnCostIndex * BYTES_PER_ENTRY;
             if (fromEdge == turnCosts.getInt(turnCostPtr + TC_FROM)) {
                 if (toEdge == turnCosts.getInt(turnCostPtr + TC_TO)) {
-                    tcFlags.setInt(0, turnCosts.getInt(turnCostPtr + TC_FLAGS));
+                    tcFlags.ints[0] = turnCosts.getInt(turnCostPtr + TC_FLAGS);
                     return;
                 }
             }
@@ -196,7 +196,7 @@ public class TurnCostStorage {
         // so many turn restrictions on one node? here is something wrong
         if (i >= 1000)
             throw new IllegalStateException("something went wrong: there seems to be no end of the turn cost-list!?");
-        tcFlags.setInt(0, EMPTY_FLAGS);
+        tcFlags.ints[0] = EMPTY_FLAGS;
     }
 
     private void ensureTurnCostIndex(int nodeIndex) {
@@ -262,7 +262,7 @@ public class TurnCostStorage {
 
         @Override
         public double getCost(DecimalEncodedValue encodedValue) {
-            intsRef.setInt(0, turnCosts.getInt(turnCostPtr() + TC_FLAGS));
+            intsRef.ints[0] = turnCosts.getInt(turnCostPtr() + TC_FLAGS);
             return encodedValue.getDecimal(false, intsRef);
         }
 

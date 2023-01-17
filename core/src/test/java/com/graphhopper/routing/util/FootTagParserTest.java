@@ -272,7 +272,7 @@ public class FootTagParserTest {
         ReaderWay way = new ReaderWay(1);
         way.setTag("highway", "motorway");
         IntsRef flags = footParser.handleWayTags(encodingManager.createEdgeFlags(), way);
-        assertEquals(0, flags.getInt(0));
+        assertEquals(0, flags.ints[0]);
 
         way.setTag("sidewalk", "yes");
         flags = footParser.handleWayTags(encodingManager.createEdgeFlags(), way);

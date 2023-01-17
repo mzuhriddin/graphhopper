@@ -25,7 +25,6 @@ import com.graphhopper.routing.ev.RoadAccess;
 import com.graphhopper.routing.util.TransportationMode;
 import com.graphhopper.routing.util.countryrules.CountryRule;
 import com.graphhopper.storage.IntsRef;
-import com.graphhopper.storage.IntsRefImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +37,7 @@ class OSMRoadAccessParserTest {
         roadAccessEnc.init(new EncodedValue.InitializerConfig());
 
         OSMRoadAccessParser parser = new OSMRoadAccessParser(roadAccessEnc, OSMRoadAccessParser.toOSMRestrictions(TransportationMode.CAR));
-        IntsRef relFlags = new IntsRefImpl(2);
+        IntsRef relFlags = new IntsRef(2);
         ReaderWay way = new ReaderWay(27L);
         way.setTag("highway", "track");
         way.setTag("country_rule", new CountryRule() {
@@ -47,12 +46,12 @@ class OSMRoadAccessParserTest {
                 return RoadAccess.DESTINATION;
             }
         });
-        IntsRef edgeFlags = new IntsRefImpl(1);
+        IntsRef edgeFlags = new IntsRef(1);
         parser.handleWayTags(edgeFlags, way, relFlags);
         assertEquals(RoadAccess.DESTINATION, roadAccessEnc.getEnum(false, edgeFlags));
 
         // if there is no country rule we get the default value
-        edgeFlags = new IntsRefImpl(1);
+        edgeFlags = new IntsRef(1);
         way.removeTag("country_rule");
         parser.handleWayTags(edgeFlags, way, relFlags);
         assertEquals(RoadAccess.YES, roadAccessEnc.getEnum(false, edgeFlags));
