@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.graphhopper.jackson.Jackson;
 import com.graphhopper.routing.ev.*;
 import com.graphhopper.storage.IntsRef;
-import com.graphhopper.storage.IntsRefImpl;
 import com.graphhopper.storage.StorableProperties;
 import com.graphhopper.util.Constants;
 import com.graphhopper.util.PMap;
@@ -261,12 +260,12 @@ public class EncodingManager implements EncodedValueLookup {
 
     // TODO hide IntsRef even more in a later version: https://gist.github.com/karussell/f4c2b2b1191be978d7ee9ec8dd2cd48f
     public IntsRef createEdgeFlags() {
-        return new IntsRefImpl(getIntsForFlags());
+        return new IntsRef(getIntsForFlags());
     }
 
     public IntsRef createRelationFlags() {
         // for backward compatibility use 2 ints
-        return new IntsRefImpl(2);
+        return new IntsRef(2);
     }
 
     public boolean needsTurnCostsSupport() {

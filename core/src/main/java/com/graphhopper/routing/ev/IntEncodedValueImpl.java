@@ -176,14 +176,14 @@ public class IntEncodedValueImpl implements IntEncodedValue {
 
         value -= minStorableValue;
         if (reverse) {
-            int flags = ref.getInt(bwdDataIndex + ref.getOffset());
+            int flags = ref.ints[bwdDataIndex + ref.offset];
             // clear value bits
             flags &= ~bwdMask;
-            ref.setInt(bwdDataIndex + ref.getOffset(), flags | (value << bwdShift));
+            ref.ints[bwdDataIndex + ref.offset] = flags | (value << bwdShift);
         } else {
-            int flags = ref.getInt(fwdDataIndex + ref.getOffset());
+            int flags = ref.ints[fwdDataIndex + ref.offset];
             flags &= ~fwdMask;
-            ref.setInt(fwdDataIndex + ref.getOffset(), flags | (value << fwdShift));
+            ref.ints[fwdDataIndex + ref.offset] = flags | (value << fwdShift);
         }
     }
 
@@ -192,10 +192,10 @@ public class IntEncodedValueImpl implements IntEncodedValue {
         int flags;
         // if we do not store both directions ignore reverse == true for convenient reading
         if (storeTwoDirections && reverse) {
-            flags = ref.getInt(bwdDataIndex + ref.getOffset());
+            flags = ref.ints[bwdDataIndex + ref.offset];
             return minStorableValue + ((flags & bwdMask) >>> bwdShift);
         } else {
-            flags = ref.getInt(fwdDataIndex + ref.getOffset());
+            flags = ref.ints[fwdDataIndex + ref.offset];
             if (negateReverseDirection && reverse)
                 return -(minStorableValue + ((flags & fwdMask) >>> fwdShift));
             return minStorableValue + ((flags & fwdMask) >>> fwdShift);

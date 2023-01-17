@@ -240,24 +240,16 @@ class BaseGraphNodesAndEdges {
         return (long) edge * edgeEntryBytes;
     }
 
-    public int getInt(long edgePointer, int index) {
-        return edges.getInt(edgePointer + E_FLAGS + index * 4L);
-    }
-
-    public void setInt(long edgePointer, int index, int value) {
-        edges.setInt(edgePointer + E_FLAGS + index * 4L, value);
-    }
-
     public void readFlags(long edgePointer, IntsRef edgeFlags) {
-        int size = edgeFlags.size();
+        int size = edgeFlags.ints.length;
         for (int i = 0; i < size; ++i)
-            edgeFlags.setInt(i, edges.getInt(edgePointer + E_FLAGS + i * 4));
+            edgeFlags.ints[i] = edges.getInt(edgePointer + E_FLAGS + i * 4);
     }
 
     public void writeFlags(long edgePointer, IntsRef edgeFlags) {
-        int size = edgeFlags.size();
+        int size = edgeFlags.ints.length;
         for (int i = 0; i < size; ++i)
-            edges.setInt(edgePointer + E_FLAGS + i * 4, edgeFlags.getInt(i));
+            edges.setInt(edgePointer + E_FLAGS + i * 4, edgeFlags.ints[i]);
     }
 
     public void setNodeA(long edgePointer, int nodeA) {
@@ -381,7 +373,7 @@ class BaseGraphNodesAndEdges {
         System.out.println("edges:");
         String formatEdges = "%12s | %12s | %12s | %12s | %12s | %12s | %12s \n";
         System.out.format(Locale.ROOT, formatEdges, "#", "E_NODEA", "E_NODEB", "E_LINKA", "E_LINKB", "E_FLAGS", "E_DIST");
-        IntsRef intsRef = new IntsRefImpl(intsForFlags);
+        IntsRef intsRef = new IntsRef(intsForFlags);
         for (int i = 0; i < Math.min(edgeCount, printMax); ++i) {
             long edgePointer = toEdgePointer(i);
             readFlags(edgePointer, intsRef);
