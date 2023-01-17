@@ -1,7 +1,6 @@
 package com.graphhopper.routing.ev;
 
 import com.graphhopper.storage.IntsRef;
-import com.graphhopper.storage.IntsRefImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,7 +16,7 @@ public class BooleanEncodedValueTest {
 
         BooleanEncodedValue bool = new SimpleBooleanEncodedValue("access", false);
         bool.init(config);
-        IntsRef ref = new IntsRefImpl(1);
+        IntsRef ref = new IntsRef(1);
         bool.setBool(false, ref, false);
         assertFalse(bool.getBool(false, ref));
         bool.setBool(false, ref, true);
@@ -29,7 +28,7 @@ public class BooleanEncodedValueTest {
         EncodedValue.InitializerConfig config = new EncodedValue.InitializerConfig();
         BooleanEncodedValue bool = new SimpleBooleanEncodedValue("access", true);
         bool.init(config);
-        IntsRef ref = new IntsRefImpl(1);
+        IntsRef ref = new IntsRef(1);
         bool.setBool(false, ref, false);
         bool.setBool(true, ref, true);
 

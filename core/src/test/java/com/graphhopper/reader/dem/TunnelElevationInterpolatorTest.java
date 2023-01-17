@@ -20,7 +20,6 @@ package com.graphhopper.reader.dem;
 import com.graphhopper.coll.GHIntHashSet;
 import com.graphhopper.routing.ev.RoadEnvironment;
 import com.graphhopper.storage.IntsRef;
-import com.graphhopper.storage.IntsRefImpl;
 import com.graphhopper.storage.NodeAccess;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.GHUtility;
@@ -35,7 +34,7 @@ public class TunnelElevationInterpolatorTest extends EdgeElevationInterpolatorTe
 
     @Override
     protected IntsRef createInterpolatableFlags() {
-        IntsRef edgeFlags = new IntsRefImpl(1);
+        IntsRef edgeFlags = new IntsRef(1);
         roadEnvEnc.setEnum(false, edgeFlags, RoadEnvironment.TUNNEL);
         return edgeFlags;
     }
