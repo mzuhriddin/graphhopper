@@ -12,12 +12,12 @@ import com.graphhopper.storage.IntsRef;
 public interface IntEncodedValue extends EncodedValue {
 
     /**
-     * This method restores the integer value from the specified 'flags' taken from the storage.
+     * This method restores the integer value for the given edge and direction.
      */
     int getInt(boolean reverse, IntsRef ref);
 
     /**
-     * This method stores the specified integer value in the specified IntsRef.
+     * This method stores the given integer value for the given edge and direction.
      */
     void setInt(boolean reverse, IntsRef ref, int value);
 
