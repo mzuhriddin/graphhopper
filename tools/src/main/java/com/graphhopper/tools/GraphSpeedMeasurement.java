@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class GraphSpeedMeasurement {
 
@@ -53,25 +54,33 @@ public class GraphSpeedMeasurement {
             BaseGraph baseGraph = hopper.getBaseGraph();
 
             EncodingManager em = hopper.getEncodingManager();
-            EnumEncodedValue<RoadClass> roadClassEnc = em.getEnumEncodedValue(RoadClass.KEY, RoadClass.class);
-            DecimalEncodedValue maxSpeedEnc = em.getDecimalEncodedValue(MaxSpeed.KEY);
-            DecimalEncodedValue speedEnc = em.getDecimalEncodedValue(VehicleSpeed.key("roads"));
-            BooleanEncodedValue accessEnc = em.getBooleanEncodedValue(VehicleAccess.key("roads"));
+            List<BooleanEncodedValue> booleanEncodedValues = em.getEncodedValues().stream().filter(e -> e instanceof BooleanEncodedValue).map(e -> (BooleanEncodedValue)e).collect(Collectors.toList());
+            List<IntEncodedValue> intEncodedValues = em.getEncodedValues().stream().filter(e -> e.getClass().equals(IntEncodedValueImpl.class)).map(e -> (IntEncodedValue)e).collect(Collectors.toList());
+            List<DecimalEncodedValue> decimalEncodedValues = em.getEncodedValues().stream().filter(e -> e instanceof DecimalEncodedValue).map(e -> (DecimalEncodedValue)e).collect(Collectors.toList());
+            List<EnumEncodedValue> enumEncodedValues = em.getEncodedValues().stream().filter(e -> e.getClass().isAssignableFrom(EnumEncodedValue.class)).map(e -> (EnumEncodedValue)e).collect(Collectors.toList());
 
             EdgeExplorer explorer = baseGraph.createEdgeExplorer();
             Random rnd = new Random(123);
 
-            final int iterations = args.getInt("iters", 10_000_000);
+            final int iterations = args.getInt("iters", 1_000_000);
+            // this parameter is quite interesting, because when we do multiple repeats per edge the differences between
+            // caching and not caching should become more clear. if we benefited from caching doing multiple repeats should
+            // not make much of a difference (thinking naively), while not caching should mean we need to do more work.
+            final int repeatsPerEdge = args.getInt("repeats_per_edge", 10);
             MiniPerfTest t = new MiniPerfTest().setIterations(iterations)
                     .start((warmup, run) -> {
                         EdgeIterator iter = explorer.setBaseNode(rnd.nextInt(baseGraph.getNodes()));
                         double sum = 0;
                         while (iter.next()) {
-                            RoadClass roadClass = iter.get(roadClassEnc);
-                            double maxSpeed = iter.get(maxSpeedEnc);
-                            double speed = iter.get(speedEnc);
-                            boolean access = iter.get(accessEnc);
-                            sum += (roadClass == RoadClass.MOTORWAY ? 3 : 1) + (maxSpeed < 100 ? 3 : 1) + (speed > 50 ? 2 : 1) + (access ? 1 : 0);
+                            for (int i = 0; i < repeatsPerEdge; i++) {
+                                // note that reading **all** the EVs should be in favor of the caching solution, while cases
+                                // with many encoded values where only a selected few are read should make the caching less
+                                // important. but even in this scenario the caching provides no speedup apparently!
+                                for (BooleanEncodedValue ev : booleanEncodedValues) sum += iter.get(ev) ? 1 : 0;
+                                for (IntEncodedValue ev : intEncodedValues) sum += iter.get(ev) > 5 ? 1 : 0;
+                                for (DecimalEncodedValue ev : decimalEncodedValues) sum += iter.get(ev) > 20 ? 1 : 0;
+                                for (EnumEncodedValue ev : enumEncodedValues) sum += iter.get(ev).ordinal();
+                            }
                         }
                         return (int) sum;
                     });
