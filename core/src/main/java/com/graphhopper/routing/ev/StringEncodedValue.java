@@ -75,8 +75,12 @@ public final class StringEncodedValue extends IntEncodedValueImpl {
     }
 
     public final void setString(boolean reverse, IntsRef ref, String value) {
+        setString(reverse, -1, ref, value);
+    }
+
+    public final void setString(boolean reverse, int edgeId, IntsRef ref, String value) {
         if (value == null) {
-            super.setInt(reverse, ref, 0);
+            super.setInt(reverse, edgeId, ref, 0);
             return;
         }
         int index = indexMap.getOrDefault(value, 0);
@@ -88,11 +92,15 @@ public final class StringEncodedValue extends IntEncodedValueImpl {
             index = values.size();
             indexMap.put(value, index);
         }
-        super.setInt(reverse, ref, index);
+        super.setInt(reverse, edgeId, ref, index);
     }
 
     public final String getString(boolean reverse, IntsRef ref) {
-        int value = super.getInt(reverse, ref);
+        return getString(reverse, -1, ref);
+    }
+
+    public final String getString(boolean reverse, int edgeId, IntsRef ref) {
+        int value = super.getInt(reverse, edgeId, ref);
         if (value == 0) {
             return null;
         }

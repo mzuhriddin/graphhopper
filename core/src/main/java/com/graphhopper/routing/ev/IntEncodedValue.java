@@ -14,12 +14,20 @@ public interface IntEncodedValue extends EncodedValue {
     /**
      * This method restores the integer value from the specified 'flags' taken from the storage.
      */
-    int getInt(boolean reverse, IntsRef ref);
+    default int getInt(boolean reverse, IntsRef ref) {
+        return getInt(reverse, -1, ref);
+    }
+
+    int getInt(boolean reverse, int edgeId, IntsRef ref);
 
     /**
      * This method stores the specified integer value in the specified IntsRef.
      */
-    void setInt(boolean reverse, IntsRef ref, int value);
+    default void setInt(boolean reverse, IntsRef ref, int value) {
+        setInt(reverse, -1, ref, value);
+    }
+
+    void setInt(boolean reverse, int edgeId, IntsRef ref, int value);
 
     /**
      * The maximum int value this EncodedValue accepts for setInt without throwing an exception.
