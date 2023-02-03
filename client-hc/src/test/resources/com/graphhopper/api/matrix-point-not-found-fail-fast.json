@@ -2,11 +2,7 @@
   "status": "finished",
   "solution": {
     "info": {
-      "took": 0.049935993,
-      "copyrights": [
-        "GraphHopper",
-        "OpenStreetMap contributors"
-      ]
+      "took": 0.049935993
     },
     "weights": [
       [0, null, 1],

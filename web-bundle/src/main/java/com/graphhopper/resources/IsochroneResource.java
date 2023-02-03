@@ -9,7 +9,6 @@ import com.graphhopper.http.ProfileResolver;
 import com.graphhopper.isochrone.algorithm.ContourBuilder;
 import com.graphhopper.isochrone.algorithm.ShortestPathTree;
 import com.graphhopper.isochrone.algorithm.Triangulator;
-import com.graphhopper.jackson.ResponsePathSerializer;
 import com.graphhopper.routing.ev.BooleanEncodedValue;
 import com.graphhopper.routing.ev.Subnetwork;
 import com.graphhopper.routing.querygraph.QueryGraph;
@@ -145,9 +144,6 @@ public class IsochroneResource {
             JsonFeature feature = new JsonFeature();
             HashMap<String, Object> properties = new HashMap<>();
             properties.put("bucket", features.size());
-            if (respType == geojson) {
-                properties.put("copyrights", ResponsePathSerializer.COPYRIGHTS);
-            }
             feature.setProperties(properties);
             feature.setGeometry(isochrone);
             features.add(feature);
@@ -163,7 +159,6 @@ public class IsochroneResource {
         } else {
             json.putPOJO("polygons", features);
             final ObjectNode info = json.putObject("info");
-            info.putPOJO("copyrights", ResponsePathSerializer.COPYRIGHTS);
             info.put("took", Math.round((float) sw.getMillis()));
             finalJson = json;
         }

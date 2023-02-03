@@ -24,7 +24,6 @@ import com.graphhopper.http.GHLocationParam;
 import com.graphhopper.http.OffsetDateTimeParam;
 import com.graphhopper.isochrone.algorithm.ContourBuilder;
 import com.graphhopper.isochrone.algorithm.ReadableTriangulation;
-import com.graphhopper.jackson.ResponsePathSerializer;
 import com.graphhopper.routing.ev.*;
 import com.graphhopper.routing.util.DefaultSnapFilter;
 import com.graphhopper.routing.util.EncodingManager;
@@ -70,12 +69,7 @@ public class PtIsochroneResource {
     }
 
     public static class Response {
-        public static class Info {
-            public List<String> copyrights = new ArrayList<>();
-        }
-
         public List<JsonFeature> polygons = new ArrayList<>();
-        public Info info = new Info();
     }
 
     @GET
@@ -189,7 +183,6 @@ public class PtIsochroneResource {
                 properties.put("z", targetZ);
                 feature.setProperties(properties);
                 response.polygons.add(feature);
-                response.info.copyrights.addAll(ResponsePathSerializer.COPYRIGHTS);
                 return response;
             } else {
                 return wrap(isoline);
@@ -207,7 +200,6 @@ public class PtIsochroneResource {
 
         Response response = new Response();
         response.polygons.add(feature);
-        response.info.copyrights.addAll(ResponsePathSerializer.COPYRIGHTS);
         return response;
     }
 

@@ -32,29 +32,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GHGeocodingResponse {
 
-    private List<String> copyrights = new ArrayList<>(5);
     private List<GHGeocodingEntry> hits;
     private String locale = "en";
 
-    public GHGeocodingResponse() {
-        this(5);
-    }
-
     public GHGeocodingResponse(int no) {
         hits = new ArrayList<>(no);
-    }
-
-    public void setCopyrights(List<String> copyrights) {
-        this.copyrights = copyrights;
-    }
-
-    public List<String> getCopyrights() {
-        return copyrights;
-    }
-
-    public GHGeocodingResponse addCopyright(String cr) {
-        copyrights.add(cr);
-        return this;
     }
 
     public void setHits(List<GHGeocodingEntry> hits) {

@@ -342,7 +342,6 @@ public class IsochroneResourceTest {
         assertTrue(firstFeature.isObject());
 
         assertTrue(firstFeature.path("properties").has("bucket"));
-        assertTrue(firstFeature.path("properties").has("copyrights"));
 
         assertEquals(firstFeature.path("type").asText(), "Feature");
         assertEquals(firstFeature.path("geometry").path("type").asText(), "Polygon");
